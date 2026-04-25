@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incremental ETL Pipeline with Star Schema | Project Blog</title>
 
 <style>
 :root{
@@ -70,20 +71,6 @@ max-width:980px;
 margin:auto;
 padding:75px 20px 45px;
 text-align:center;
-}
-
-.badge{
-display:inline-block;
-padding:8px 14px;
-border-radius:30px;
-background:var(--soft);
-color:var(--primary);
-font-family:Arial,sans-serif;
-font-size:12px;
-font-weight:700;
-letter-spacing:.5px;
-text-transform:uppercase;
-margin-bottom:18px;
 }
 
 header h1{
@@ -222,12 +209,6 @@ line-height:1.6;
 margin:18px 0;
 }
 
-code{
-background:#eef2ff;
-padding:2px 6px;
-border-radius:4px;
-}
-
 table{
 width:100%;
 border-collapse:collapse;
@@ -297,7 +278,6 @@ font-size:17px;
 </nav>
 
 <header>
-<div class="badge">Final Project Blog</div>
 <h1>Incremental ETL Pipeline with <span>Star Schema</span></h1>
 <p>
 Complete Data Warehouse project using Amazon sales data, Python ETL processing, PostgreSQL, and incremental loading strategy.
@@ -311,11 +291,9 @@ Complete Data Warehouse project using Amazon sales data, Python ETL processing, 
 
 <section id="intro">
 <h2>Introduction</h2>
-
 <p>
 This project focuses on building a complete data warehouse using Amazon e-commerce sales data. Raw CSV data was transformed into structured tables using Python and loaded into PostgreSQL using star schema design.
 </p>
-
 <p>
 To improve efficiency, incremental loading was implemented so that only new records are loaded during future executions.
 </p>
@@ -323,7 +301,6 @@ To improve efficiency, incremental loading was implemented so that only new reco
 
 <section id="dataset">
 <h2>Dataset Description</h2>
-
 <p>
 The dataset contains Amazon India sales transactions including order details, quantity, product category, amount, state, city, and fulfilment details.
 </p>
@@ -342,22 +319,16 @@ The dataset contains Amazon India sales transactions including order details, qu
 
 <section id="architecture">
 <h2>System Architecture</h2>
-
 <div class="box">
-CSV Files → Python → Cleaning & Transformation → PostgreSQL Warehouse → SQL Analysis
+CSV Files → Python → Data Cleaning → PostgreSQL Warehouse → SQL Analysis
 </div>
-
 <p>
-The project follows ETL architecture where source files are extracted, cleaned, transformed, and loaded into a warehouse for analysis.
+The project follows ETL architecture where source files are extracted, transformed, and loaded into a warehouse for reporting.
 </p>
 </section>
 
 <section id="schema">
 <h2>Star Schema Design</h2>
-
-<p>
-The warehouse was designed using one fact table and multiple dimension tables.
-</p>
 
 <ul>
 <li>fact_sales</li>
@@ -390,41 +361,26 @@ CREATE TABLE fact_sales(
  amount_inr NUMERIC(12,2)
 );
 </pre>
-
 </section>
 
 <section id="etl">
 <h2>ETL Pipeline</h2>
 
 <h3>Extract</h3>
-
 <pre>
 import pandas as pd
-
-df = pd.read_csv(
- "Amazon Sale Report.csv",
- low_memory=False
-)
+df = pd.read_csv("Amazon Sale Report.csv")
 </pre>
 
 <h3>Transform</h3>
-
 <pre>
 df.columns = df.columns.str.lower()
-df.columns = df.columns.str.replace(" ","_")
-
-df['date'] = pd.to_datetime(
- df['date'],
- errors='coerce'
-)
-
+df['date'] = pd.to_datetime(df['date'])
 df['amount'] = df['amount'].fillna(0)
-
 df = df.drop_duplicates()
 </pre>
 
 <h3>Load</h3>
-
 <pre>
 from sqlalchemy import create_engine
 
@@ -432,54 +388,12 @@ engine = create_engine(
 'postgresql://postgres:password@localhost:5432/amazon_dw'
 )
 
-df.to_sql(
- 'staging_sales',
- engine,
- if_exists='replace',
- index=False
-)
+df.to_sql('staging_sales', engine, if_exists='replace')
 </pre>
-
-</section>
-
-<section>
-<h2>Dimension Table Loading</h2>
-
-<h3>Product Dimension</h3>
-
-<pre>
-product_df = df[
- ['sku','style','category','size']
-].drop_duplicates()
-
-product_df.to_sql(
- 'dim_product',
- engine,
- if_exists='append',
- index=False
-)
-</pre>
-
-<h3>Date Dimension</h3>
-
-<pre>
-date_df = pd.DataFrame()
-
-date_df['full_date'] = pd.to_datetime(df['date'])
-
-date_df['day'] = date_df['full_date'].dt.day
-date_df['month'] = date_df['full_date'].dt.month
-date_df['year'] = date_df['full_date'].dt.year
-</pre>
-
 </section>
 
 <section id="incremental">
 <h2>Incremental Loading using Watermark</h2>
-
-<p>
-To avoid full data reload every run, watermark logic stores the latest loaded date.
-</p>
 
 <pre>
 CREATE TABLE etl_watermark(
@@ -495,15 +409,13 @@ WHERE table_name='fact_sales';
 </pre>
 
 <pre>
-new_df = df[
- df['date'] > last_loaded_date
-]
+new_df = df[df['date'] > last_loaded_date]
 </pre>
 
 <div class="box">
 Run 1 → Full Load<br>
-Run 2 → Load Only New Rows<br>
-Next Runs → Continue Incremental Load
+Run 2 → Only New Rows<br>
+Future Runs → Incremental Load
 </div>
 
 </section>
@@ -511,54 +423,35 @@ Next Runs → Continue Incremental Load
 <section id="insights">
 <h2>Business Insights</h2>
 
-<h3>Top States by Revenue</h3>
-
 <pre>
 SELECT state,
-SUM(amount_inr) revenue
-FROM fact_sales fs
-JOIN dim_location dl
-ON fs.location_key = dl.location_key
-GROUP BY state
-ORDER BY revenue DESC;
-</pre>
-
-<h3>Monthly Revenue</h3>
-
-<pre>
-SELECT month,
 SUM(amount_inr)
-FROM fact_sales fs
-JOIN dim_date dd
-ON fs.date_key = dd.date_key
-GROUP BY month;
+FROM fact_sales
+GROUP BY state
+ORDER BY SUM(amount_inr) DESC;
 </pre>
 
 <ul>
 <li>Maharashtra generated highest revenue</li>
 <li>April recorded peak monthly sales</li>
-<li>Set category was top category</li>
-<li>B2C orders were more than B2B</li>
+<li>Set category was top selling category</li>
+<li>B2C orders were higher than B2B</li>
 </ul>
 
 </section>
 
 <section>
 <h2>Challenges Faced</h2>
-
 <ul>
-<li>Messy raw data columns</li>
-<li>Null values in amount</li>
-<li>Date parsing issues</li>
-<li>Foreign key mapping</li>
-<li>Load sequence dependencies</li>
+<li>Null values in amount column</li>
+<li>Date conversion issues</li>
+<li>Dimension mapping</li>
+<li>Loading sequence dependencies</li>
 </ul>
-
 </section>
 
 <section>
 <h2>Learning Outcomes</h2>
-
 <ul>
 <li>Hands-on ETL development</li>
 <li>Warehouse schema design</li>
@@ -566,20 +459,16 @@ GROUP BY month;
 <li>Incremental pipeline creation</li>
 <li>SQL analytical queries</li>
 </ul>
-
 </section>
 
 <section id="conclusion">
 <h2>Conclusion</h2>
-
 <p>
-This project helped me understand real-world data engineering concepts including ETL workflow, dimensional modelling, incremental loading, and business reporting.
+This project helped me understand real-world data engineering concepts including ETL workflow, dimensional modelling, incremental loading, and reporting.
 </p>
-
 <p>
 It was a valuable practical experience in data warehouse development.
 </p>
-
 </section>
 
 </article>
@@ -619,7 +508,7 @@ GitHub Repository
 </div>
 
 <footer>
-Created by K. Asritha • Final Data Warehouse Project Blog
+Created by K. Asritha • Data Warehouse Project Blog
 </footer>
 
 </body>
