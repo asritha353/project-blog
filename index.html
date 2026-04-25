@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Incremental ETL Pipeline with Star Schema | Project Blog</title>
+<title>Incremental ETL Pipeline with Star Schema | Premium Project Blog</title>
 
 <style>
 :root{
---primary:#1e40af;
+--primary:#1d4ed8;
 --dark:#0f172a;
 --muted:#64748b;
 --bg:#f8fafc;
 --white:#ffffff;
 --border:#e2e8f0;
---light:#eff6ff;
+--soft:#eff6ff;
+--success:#16a34a;
 }
 
 *{
@@ -33,17 +34,17 @@ color:#1f2937;
 line-height:1.8;
 }
 
-/* NAVBAR */
+/* NAV */
 nav{
 position:sticky;
 top:0;
 z-index:1000;
-background:rgba(255,255,255,0.95);
+background:rgba(255,255,255,.96);
 backdrop-filter:blur(10px);
 border-bottom:1px solid var(--border);
-padding:15px 28px;
+padding:15px 30px;
 display:flex;
-gap:22px;
+gap:20px;
 flex-wrap:wrap;
 align-items:center;
 }
@@ -52,8 +53,8 @@ align-items:center;
 font-family:Arial,sans-serif;
 font-weight:700;
 font-size:17px;
-color:var(--dark);
 margin-right:auto;
+color:var(--dark);
 }
 
 nav a{
@@ -69,32 +70,30 @@ color:var(--primary);
 
 /* HERO */
 header{
-max-width:980px;
+max-width:1020px;
 margin:auto;
-padding:75px 20px 45px;
+padding:78px 20px 45px;
 text-align:center;
 }
 
 .badge{
 display:inline-block;
-padding:7px 14px;
-font-size:12px;
+padding:8px 14px;
+border-radius:30px;
+background:var(--soft);
+color:var(--primary);
 font-family:Arial,sans-serif;
+font-size:12px;
 font-weight:700;
 letter-spacing:.6px;
 text-transform:uppercase;
-background:var(--light);
-color:var(--primary);
-border-radius:25px;
 margin-bottom:18px;
 }
 
 header h1{
-font-size:54px;
+font-size:56px;
 line-height:1.2;
 color:var(--dark);
-max-width:920px;
-margin:auto;
 }
 
 header h1 span{
@@ -117,19 +116,19 @@ color:#64748b;
 
 /* LAYOUT */
 .wrapper{
-max-width:1180px;
+max-width:1220px;
 margin:auto;
 padding:0 20px 60px;
 display:grid;
-grid-template-columns:minmax(0,1fr) 300px;
+grid-template-columns:minmax(0,1fr) 310px;
 gap:42px;
 }
 
 article{
 background:var(--white);
-padding:42px;
-border-radius:16px;
-box-shadow:0 10px 30px rgba(0,0,0,.05);
+padding:45px;
+border-radius:18px;
+box-shadow:0 10px 35px rgba(0,0,0,.05);
 }
 
 aside{
@@ -141,8 +140,8 @@ height:fit-content;
 .card{
 background:var(--white);
 padding:22px;
-border-radius:16px;
-box-shadow:0 10px 30px rgba(0,0,0,.05);
+border-radius:18px;
+box-shadow:0 10px 35px rgba(0,0,0,.05);
 margin-bottom:20px;
 }
 
@@ -157,14 +156,25 @@ margin-bottom:12px;
 
 .card a{
 display:block;
-margin-bottom:10px;
 font-family:Arial,sans-serif;
 font-size:14px;
 text-decoration:none;
 color:#475569;
+margin-bottom:10px;
 }
 
 .card a:hover{
+color:var(--primary);
+}
+
+.tag{
+display:inline-block;
+padding:6px 10px;
+margin:4px;
+border-radius:20px;
+font-family:Arial,sans-serif;
+font-size:12px;
+background:var(--soft);
 color:var(--primary);
 }
 
@@ -172,14 +182,13 @@ color:var(--primary);
 h2{
 font-size:34px;
 margin-top:42px;
-margin-bottom:15px;
-line-height:1.3;
+margin-bottom:14px;
 color:var(--dark);
 }
 
 h3{
 font-size:24px;
-margin-top:26px;
+margin-top:28px;
 margin-bottom:12px;
 color:var(--primary);
 }
@@ -190,7 +199,7 @@ margin-bottom:16px;
 }
 
 ul{
-margin-left:25px;
+margin-left:24px;
 font-size:18px;
 margin-bottom:18px;
 }
@@ -200,11 +209,16 @@ margin-bottom:8px;
 }
 
 .box{
-background:var(--light);
+background:var(--soft);
 border-left:4px solid var(--primary);
 padding:18px;
 border-radius:10px;
 margin:22px 0;
+}
+
+.success{
+border-left-color:var(--success);
+background:#f0fdf4;
 }
 
 pre{
@@ -213,7 +227,7 @@ color:#e2e8f0;
 padding:18px;
 border-radius:12px;
 overflow:auto;
-font-size:15px;
+font-size:14px;
 line-height:1.6;
 margin:18px 0;
 }
@@ -222,13 +236,12 @@ code{
 background:#f1f5f9;
 padding:2px 6px;
 border-radius:4px;
-font-family:Consolas, monospace;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-margin:18px 0;
+margin:20px 0;
 font-size:16px;
 }
 
@@ -236,15 +249,30 @@ th,td{
 border:1px solid #e5e7eb;
 padding:12px;
 text-align:left;
+vertical-align:top;
 }
 
 th{
 background:#f8fafc;
 }
 
+.img-placeholder{
+height:230px;
+border:2px dashed #cbd5e1;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:Arial,sans-serif;
+font-size:15px;
+color:#64748b;
+background:#f8fafc;
+margin:20px 0;
+}
+
 footer{
 text-align:center;
-padding:32px;
+padding:34px;
 font-family:Arial,sans-serif;
 font-size:14px;
 color:#64748b;
@@ -259,7 +287,7 @@ aside{
 position:static;
 }
 header h1{
-font-size:40px;
+font-size:42px;
 }
 article{
 padding:26px;
@@ -268,7 +296,7 @@ padding:26px;
 
 @media(max-width:640px){
 header h1{
-font-size:32px;
+font-size:34px;
 }
 h2{
 font-size:28px;
@@ -285,6 +313,7 @@ font-size:17px;
 <nav>
 <div class="brand">Data Warehouse Project</div>
 <a href="#intro">Intro</a>
+<a href="#dataset">Dataset</a>
 <a href="#architecture">Architecture</a>
 <a href="#schema">Schema</a>
 <a href="#etl">ETL</a>
@@ -294,12 +323,12 @@ font-size:17px;
 </nav>
 
 <header>
-<div class="badge">Project Blog</div>
+<div class="badge">Premium Project Blog</div>
 <h1>Incremental ETL Pipeline with <span>Star Schema</span></h1>
 <p>
-Building a complete data warehouse solution using Amazon sales data, PostgreSQL, Python, and efficient incremental loading techniques.
+Building a complete PostgreSQL data warehouse using Amazon sales data, Python ETL workflows, and incremental loading using watermark strategy.
 </p>
-<div class="meta">By K. Asritha • April 2026 • Data Engineering / Warehouse Project</div>
+<div class="meta">By K. Asritha • April 2026 • Data Warehouse / Data Engineering Project</div>
 </header>
 
 <div class="wrapper">
@@ -310,11 +339,15 @@ Building a complete data warehouse solution using Amazon sales data, PostgreSQL,
 <h2>Introduction</h2>
 
 <p>
-Modern businesses generate large amounts of transactional data every day. Raw operational data is useful for transactions, but it is not ideal for analytics. To solve this problem, organizations build data warehouses that store structured historical data for reporting and decision making.
+Organizations generate large amounts of data every day through sales, customer activity, inventory, and transactions. Raw operational data is useful for day-to-day operations, but it is not optimized for analytical reporting.
 </p>
 
 <p>
-In this project, I developed a complete ETL pipeline using Amazon e-commerce sales data. The raw CSV dataset was transformed and loaded into PostgreSQL using a star schema model. I also implemented incremental loading so future executions process only newly added records.
+To solve this problem, companies build data warehouses that organize historical data in a structured format. In this project, I created a complete data warehouse using Amazon e-commerce sales data and PostgreSQL.
+</p>
+
+<p>
+The project includes ETL processing, star schema modelling, SQL analysis, and incremental loading so that future executions process only new data.
 </p>
 
 </section>
@@ -323,33 +356,63 @@ In this project, I developed a complete ETL pipeline using Amazon e-commerce sal
 <h2>Project Objectives</h2>
 
 <ul>
-<li>Understand real-world ETL workflow</li>
-<li>Design a dimensional data warehouse</li>
-<li>Load data into PostgreSQL</li>
-<li>Improve performance using incremental ETL</li>
-<li>Generate business insights through SQL</li>
+<li>Build a complete ETL pipeline using Python</li>
+<li>Design a star schema warehouse</li>
+<li>Load cleaned data into PostgreSQL</li>
+<li>Implement incremental loading</li>
+<li>Generate business insights using SQL</li>
+<li>Understand practical data engineering workflow</li>
 </ul>
+
+</section>
+
+<section id="dataset">
+<h2>Dataset Description</h2>
+
+<p>
+The source dataset contains Amazon India sales transactions with order details, product categories, revenue, city, state, quantity, status, and fulfilment information.
+</p>
+
+<table>
+<tr><th>Column</th><th>Description</th></tr>
+<tr><td>Order ID</td><td>Unique sales order number</td></tr>
+<tr><td>Date</td><td>Order date</td></tr>
+<tr><td>Category</td><td>Product category</td></tr>
+<tr><td>Qty</td><td>Quantity ordered</td></tr>
+<tr><td>Amount</td><td>Sales amount</td></tr>
+<tr><td>City / State</td><td>Location details</td></tr>
+<tr><td>Status</td><td>Order status</td></tr>
+</table>
+
+<div class="img-placeholder">
+Place Screenshot: Raw CSV Dataset Preview
+</div>
+
 </section>
 
 <section id="architecture">
 <h2>System Architecture</h2>
 
 <div class="box">
-CSV Dataset → Python (Pandas) → Data Cleaning → PostgreSQL Warehouse → SQL Reporting
+CSV Files → Python → Cleaning & Transformation → PostgreSQL Warehouse → SQL Analysis / Dashboard
 </div>
 
+<p>
+The system follows a layered architecture. Raw data is first extracted, transformed into structured dimensional data, and finally loaded into PostgreSQL.
+</p>
+
 <table>
-<tr><th>Tool</th><th>Purpose</th></tr>
-<tr><td>Python</td><td>ETL scripting</td></tr>
-<tr><td>Pandas</td><td>Cleaning and transformation</td></tr>
+<tr><th>Tool</th><th>Usage</th></tr>
+<tr><td>Python</td><td>ETL development</td></tr>
+<tr><td>Pandas</td><td>Transformation logic</td></tr>
 <tr><td>SQLAlchemy</td><td>Database connection</td></tr>
 <tr><td>PostgreSQL</td><td>Warehouse storage</td></tr>
-<tr><td>pgAdmin</td><td>Administration and ER diagrams</td></tr>
+<tr><td>pgAdmin</td><td>Querying and schema design</td></tr>
 </table>
 
-<p>
-This architecture separates source data from analytical storage and enables scalable reporting.
-</p>
+<div class="img-placeholder">
+Place Screenshot: Architecture Diagram / Workflow
+</div>
 
 </section>
 
@@ -357,12 +420,12 @@ This architecture separates source data from analytical storage and enables scal
 <h2>Star Schema Design</h2>
 
 <p>
-A star schema contains one fact table in the center connected to multiple dimension tables. This model is simple, fast, and widely used in analytics systems.
+A star schema contains one central fact table connected to multiple dimension tables. This design improves query speed and simplifies reporting.
 </p>
 
 <h3>Fact Table</h3>
 <ul>
-<li><strong>fact_sales</strong> – Stores each sales transaction</li>
+<li><strong>fact_sales</strong> – stores transactional measures such as quantity and amount.</li>
 </ul>
 
 <h3>Dimension Tables</h3>
@@ -374,9 +437,26 @@ A star schema contains one fact table in the center connected to multiple dimens
 <li>dim_fulfilment</li>
 </ul>
 
-<p>
-This structure supports slicing data by time, product category, region, and order status.
-</p>
+<pre>
+CREATE TABLE dim_product(
+ product_key SERIAL PRIMARY KEY,
+ sku VARCHAR(50),
+ category VARCHAR(50),
+ size VARCHAR(20)
+);
+
+CREATE TABLE fact_sales(
+ sales_key SERIAL PRIMARY KEY,
+ product_key INT,
+ date_key INT,
+ quantity INT,
+ amount_inr NUMERIC(12,2)
+);
+</pre>
+
+<div class="img-placeholder">
+Place Screenshot: pgAdmin Star Schema Tables
+</div>
 
 </section>
 
@@ -384,54 +464,123 @@ This structure supports slicing data by time, product category, region, and orde
 <h2>ETL Pipeline</h2>
 
 <h3>1. Extract</h3>
-<p>
-The CSV dataset was imported into Pandas DataFrames.
-</p>
 
 <pre>
 import pandas as pd
-df = pd.read_csv("Amazon Sale Report.csv")
+
+df = pd.read_csv(
+ "Amazon Sale Report.csv",
+ low_memory=False
+)
 </pre>
 
 <h3>2. Transform</h3>
 
-<ul>
-<li>Removed duplicates</li>
-<li>Handled null values</li>
-<li>Converted dates</li>
-<li>Renamed columns</li>
-<li>Created dimension tables</li>
-<li>Generated surrogate keys</li>
-</ul>
+<pre>
+df.columns = df.columns.str.lower()
+df.columns = df.columns.str.replace(" ","_")
+
+df['date'] = pd.to_datetime(
+ df['date'],
+ errors='coerce'
+)
+
+df['amount'] = df['amount'].fillna(0)
+
+df = df.drop_duplicates()
+</pre>
 
 <h3>3. Load</h3>
 
-<p>
-Dimension tables were loaded first, followed by the fact table with foreign key references.
-</p>
+<pre>
+from sqlalchemy import create_engine
+
+engine = create_engine(
+'postgresql://postgres:password@localhost:5432/amazon_dw'
+)
+
+df.to_sql(
+'staging_sales',
+engine,
+if_exists='replace',
+index=False
+)
+</pre>
+
+<div class="success box">
+Dimension tables are loaded first, followed by fact table to maintain foreign key integrity.
+</div>
+
+</section>
+
+<section>
+<h2>Dimension Table Loading</h2>
+
+<h3>Product Dimension</h3>
+
+<pre>
+product_df = df[
+ ['sku','style','category','size']
+].drop_duplicates()
+
+product_df.to_sql(
+ 'dim_product',
+ engine,
+ if_exists='append',
+ index=False
+)
+</pre>
+
+<h3>Date Dimension</h3>
+
+<pre>
+date_df = pd.DataFrame()
+
+date_df['full_date'] = pd.to_datetime(
+ df['date']
+).drop_duplicates()
+
+date_df['day'] = date_df['full_date'].dt.day
+date_df['month'] = date_df['full_date'].dt.month
+date_df['year'] = date_df['full_date'].dt.year
+</pre>
 
 </section>
 
 <section id="incremental">
-<h2>Incremental Loading</h2>
+<h2>Incremental Loading using Watermark</h2>
 
 <p>
-Instead of loading the full dataset every time, I used watermark logic. The last loaded date is stored in a control table.
+Instead of loading the entire dataset every run, watermark logic stores the latest processed date.
 </p>
 
-<div class="box">
-First Run → Load all records<br>
-Next Runs → Load only records newer than watermark date
-</div>
-
 <pre>
-SELECT last_loaded_date FROM etl_watermark;
-
-WHERE order_date > watermark_date
+CREATE TABLE etl_watermark(
+ table_name VARCHAR(50),
+ last_loaded_date DATE
+);
 </pre>
 
+<pre>
+SELECT last_loaded_date
+FROM etl_watermark
+WHERE table_name='fact_sales';
+</pre>
+
+<pre>
+new_df = df[
+ df['date'] > last_loaded_date
+]
+</pre>
+
+<div class="box">
+First Run → Full Load<br>
+Second Run → Only New Rows<br>
+Next Runs → Continue Incremental Loading
+</div>
+
 <p>
-This reduces processing time and is commonly used in production pipelines.
+This reduces processing time and improves scalability.
 </p>
 
 </section>
@@ -439,20 +588,40 @@ This reduces processing time and is commonly used in production pipelines.
 <section id="insights">
 <h2>Business Insights</h2>
 
+<h3>Top States by Revenue</h3>
+
+<pre>
+SELECT state,
+SUM(amount_inr) revenue
+FROM fact_sales fs
+JOIN dim_location dl
+ON fs.location_key = dl.location_key
+GROUP BY state
+ORDER BY revenue DESC;
+</pre>
+
+<h3>Monthly Revenue Trend</h3>
+
+<pre>
+SELECT month,
+SUM(amount_inr)
+FROM fact_sales fs
+JOIN dim_date dd
+ON fs.date_key = dd.date_key
+GROUP BY month;
+</pre>
+
 <ul>
 <li>Maharashtra generated highest revenue</li>
-<li>April 2022 recorded peak monthly sales</li>
-<li>Set category was top selling product type</li>
-<li>B2C orders exceeded B2B orders</li>
+<li>April recorded peak monthly sales</li>
+<li>Set category was top selling category</li>
+<li>B2C orders were more than B2B</li>
 <li>Cancelled orders were significant</li>
 </ul>
 
-<pre>
-SELECT state, SUM(amount_inr)
-FROM fact_sales
-GROUP BY state
-ORDER BY SUM(amount_inr) DESC;
-</pre>
+<div class="img-placeholder">
+Place Screenshot: Query Results / Power BI Dashboard
+</div>
 
 </section>
 
@@ -460,11 +629,12 @@ ORDER BY SUM(amount_inr) DESC;
 <h2>Challenges Faced</h2>
 
 <ul>
-<li>Inconsistent source columns</li>
-<li>Missing values in amount field</li>
-<li>Date parsing issues</li>
-<li>Foreign key load sequence</li>
-<li>Large dataset handling</li>
+<li>Messy raw dataset columns</li>
+<li>Null values in amount field</li>
+<li>Date conversion errors</li>
+<li>Dimension key mapping</li>
+<li>Load order dependencies</li>
+<li>Performance optimization</li>
 </ul>
 
 </section>
@@ -473,11 +643,11 @@ ORDER BY SUM(amount_inr) DESC;
 <h2>Learning Outcomes</h2>
 
 <ul>
-<li>Hands-on ETL development</li>
-<li>Warehouse schema design</li>
-<li>Incremental data loading</li>
-<li>SQL analytics queries</li>
-<li>Practical data engineering workflow</li>
+<li>Practical ETL workflow understanding</li>
+<li>Dimensional modelling concepts</li>
+<li>PostgreSQL warehouse development</li>
+<li>Incremental loading implementation</li>
+<li>Advanced SQL query writing</li>
 </ul>
 
 </section>
@@ -486,11 +656,11 @@ ORDER BY SUM(amount_inr) DESC;
 <h2>Conclusion</h2>
 
 <p>
-This project demonstrates how raw business data can be converted into a structured warehouse for analytics. By combining ETL processing, star schema modelling, and incremental loading, the solution becomes efficient and scalable.
+This project demonstrates how raw business data can be converted into a structured warehouse for analytics. By combining ETL processes, star schema modelling, and incremental loading, the system becomes efficient and scalable.
 </p>
 
 <p>
-It was a valuable hands-on experience in real-world data warehousing concepts.
+It was a valuable hands-on experience in real-world data engineering and warehouse development.
 </p>
 
 </section>
@@ -502,6 +672,7 @@ It was a valuable hands-on experience in real-world data warehousing concepts.
 <div class="card">
 <h4>Contents</h4>
 <a href="#intro">Introduction</a>
+<a href="#dataset">Dataset</a>
 <a href="#architecture">Architecture</a>
 <a href="#schema">Star Schema</a>
 <a href="#etl">ETL Pipeline</a>
@@ -512,17 +683,18 @@ It was a valuable hands-on experience in real-world data warehousing concepts.
 
 <div class="card">
 <h4>Technologies</h4>
-<a>Python</a>
-<a>Pandas</a>
-<a>PostgreSQL</a>
-<a>SQLAlchemy</a>
-<a>pgAdmin</a>
+<span class="tag">Python</span>
+<span class="tag">Pandas</span>
+<span class="tag">PostgreSQL</span>
+<span class="tag">SQLAlchemy</span>
+<span class="tag">pgAdmin</span>
+<span class="tag">GitHub Pages</span>
 </div>
 
 <div class="card">
-<h4>GitHub Project</h4>
+<h4>Project Link</h4>
 <a href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse" target="_blank">
-View Repository
+GitHub Repository
 </a>
 </div>
 
@@ -531,7 +703,7 @@ View Repository
 </div>
 
 <footer>
-Created by K. Asritha • Data Warehouse Project Blog
+Created by K. Asritha • Premium Data Warehouse Project Blog
 </footer>
 
 </body>
