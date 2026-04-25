@@ -1,757 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Incremental ETL Pipeline with Star Schema — Technical Blog</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incremental ETL Pipeline with Star Schema</title>
+
 <style>
-  :root {
-    --navy: #1B3A6B;
-    --blue: #2563EB;
-    --teal: #0D9488;
-    --sky: #BAE6FD;
-    --mint: #CCFBF1;
-    --light: #EFF6FF;
-    --gray: #64748B;
-    --dgray: #1E293B;
-    --orange: #F97316;
-    --green: #16A34A;
-    --text: #1E293B;
-    --muted: #64748B;
-    --bg: #F8FAFC;
-    --white: #FFFFFF;
-  }
+body{
+    margin:0;
+    padding:0;
+    font-family: Georgia, serif;
+    background:#ffffff;
+    color:#222;
+    line-height:1.8;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* NAVBAR */
+nav{
+    position:sticky;
+    top:0;
+    background:#ffffff;
+    border-bottom:1px solid #e5e5e5;
+    padding:15px 30px;
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+    z-index:100;
+}
 
-  body {
-    font-family: 'Georgia', serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.8;
-  }
+nav a{
+    text-decoration:none;
+    color:#2563eb;
+    font-size:15px;
+}
 
-  /* NAV */
-  nav {
-    background: var(--white);
-    border-bottom: 1px solid #E2E8F0;
-    padding: 0.9rem 2rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.88rem;
-  }
-  nav .brand { font-weight: 700; color: var(--navy); font-size: 1rem; }
-  nav a { color: var(--gray); text-decoration: none; }
-  nav a:hover { color: var(--blue); }
-  nav .tag-nav {
-    margin-left: auto;
-    background: var(--navy);
-    color: white;
-    padding: 0.25rem 0.9rem;
-    border-radius: 2px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
+nav a:hover{
+    text-decoration:underline;
+}
 
-  /* HERO */
-  .hero {
-    background: var(--navy);
-    color: white;
-    padding: 5rem 2rem 3.5rem;
-    text-align: center;
-  }
-  .hero .series-tag {
-    display: inline-block;
-    background: var(--teal);
-    color: white;
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 0.3rem 1rem;
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
-  }
-  .hero h1 {
-    font-size: clamp(1.9rem, 4vw, 2.8rem);
-    line-height: 1.25;
-    max-width: 760px;
-    margin: 0 auto 0.8rem;
-  }
-  .hero h1 em { color: var(--sky); font-style: normal; }
-  .hero .subtitle {
-    font-family: 'Calibri', sans-serif;
-    font-size: 1.05rem;
-    color: #93C5FD;
-    max-width: 600px;
-    margin: 0 auto 2rem;
-  }
-  .hero .meta {
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.85rem;
-    color: #CBD5E1;
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .hero .meta span { display: flex; align-items: center; gap: 0.4rem; }
+/* HEADER */
+header{
+    max-width:900px;
+    margin:auto;
+    padding:60px 20px 30px;
+}
 
-  /* LAYOUT */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 3rem 2rem;
-    display: grid;
-    grid-template-columns: 1fr 260px;
-    gap: 3.5rem;
-    align-items: start;
-  }
-  @media (max-width: 860px) {
-    .container { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-  }
+header h1{
+    font-size:42px;
+    line-height:1.3;
+    margin-bottom:15px;
+    color:#111;
+}
 
-  /* ARTICLE */
-  article h2 {
-    font-size: 1.55rem;
-    color: var(--navy);
-    margin: 2.5rem 0 0.8rem;
-    padding-top: 0.5rem;
-  }
-  article h3 {
-    font-size: 1.15rem;
-    color: var(--blue);
-    margin: 1.8rem 0 0.6rem;
-    font-family: 'Calibri', sans-serif;
-  }
-  article p {
-    margin-bottom: 1.2rem;
-    font-size: 1.02rem;
-    color: var(--text);
-  }
-  article ul, article ol {
-    margin: 0.8rem 0 1.2rem 1.6rem;
-  }
-  article li {
-    margin-bottom: 0.5rem;
-    font-size: 1.0rem;
-  }
-  article strong { color: var(--navy); }
+header p{
+    font-size:19px;
+    color:#555;
+    margin-bottom:10px;
+}
 
-  /* CALLOUT / HIGHLIGHT BOX */
-  .callout {
-    background: var(--light);
-    border-left: 4px solid var(--blue);
-    padding: 1.1rem 1.4rem;
-    margin: 1.8rem 0;
-    border-radius: 0 6px 6px 0;
-  }
-  .callout.teal { background: var(--mint); border-color: var(--teal); }
-  .callout.orange { background: #FFF7ED; border-color: var(--orange); }
-  .callout.navy { background: #EEF2FF; border-color: var(--navy); }
-  .callout p { margin: 0; font-size: 0.97rem; }
-  .callout .label {
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--navy);
-    margin-bottom: 0.4rem;
-  }
-  .callout.teal .label { color: var(--teal); }
-  .callout.orange .label { color: var(--orange); }
+.meta{
+    font-size:14px;
+    color:#777;
+}
 
-  /* CODE */
-  pre {
-    background: #1E293B;
-    color: #E2E8F0;
-    padding: 1.3rem 1.5rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    font-size: 0.88rem;
-    line-height: 1.65;
-    margin: 1.4rem 0;
-    font-family: 'Consolas', 'Courier New', monospace;
-  }
-  code {
-    background: #F1F5F9;
-    color: #C7254E;
-    padding: 0.1em 0.4em;
-    border-radius: 3px;
-    font-size: 0.9em;
-    font-family: 'Consolas', monospace;
-  }
-  pre code { background: none; color: #E2E8F0; padding: 0; font-size: inherit; }
-  .kw { color: #7DD3FC; }
-  .fn { color: #86EFAC; }
-  .cm { color: #94A3B8; font-style: italic; }
-  .st { color: #FCA5A5; }
+/* MAIN CONTENT */
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:10px 20px 60px;
+}
 
-  /* TABLE */
-  .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.93rem;
-  }
-  thead th {
-    background: var(--navy);
-    color: white;
-    padding: 0.7rem 1rem;
-    text-align: left;
-    font-weight: 700;
-  }
-  tbody td {
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid #E2E8F0;
-    vertical-align: top;
-  }
-  tbody tr:nth-child(even) td { background: #F8FAFC; }
-  tbody tr:hover td { background: #EFF6FF; }
+h2{
+    font-size:30px;
+    margin-top:50px;
+    color:#111;
+}
 
-  /* COMPARISON BOX */
-  .compare {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin: 1.8rem 0;
-  }
-  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
-  .compare-box {
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  }
-  .compare-box .cb-header {
-    padding: 0.65rem 1rem;
-    font-family: 'Calibri', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: white;
-  }
-  .compare-box .cb-body {
-    padding: 0.9rem 1rem;
-    font-size: 0.93rem;
-  }
-  .compare-box .cb-body p { margin: 0 0 0.4rem; }
+h3{
+    font-size:22px;
+    margin-top:25px;
+    color:#2563eb;
+}
 
-  /* STEP FLOW */
-  .steps { margin: 1.8rem 0; }
-  .step {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.2rem;
-    align-items: flex-start;
-  }
-  .step-num {
-    flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: var(--teal);
-    color: white;
-    font-weight: 700;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 0.1rem;
-    font-family: 'Calibri', sans-serif;
-  }
-  .step-body h4 {
-    font-size: 1rem;
-    color: var(--navy);
-    margin-bottom: 0.25rem;
-  }
-  .step-body p { margin: 0; font-size: 0.96rem; color: var(--gray); }
+p{
+    font-size:18px;
+    margin-bottom:16px;
+}
 
-  /* DIVIDER */
-  hr {
-    border: none;
-    border-top: 1px solid #E2E8F0;
-    margin: 2.5rem 0;
-  }
+ul{
+    margin-left:25px;
+    font-size:18px;
+}
 
-  /* SIDEBAR */
-  .sidebar {
-    position: sticky;
-    top: 5rem;
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.9rem;
-  }
-  .sidebar-block {
-    background: var(--white);
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 1.2rem 1.3rem;
-    margin-bottom: 1.2rem;
-  }
-  .sidebar-block h4 {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--navy);
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-  }
-  .sidebar-block ul { list-style: none; padding: 0; margin: 0; }
-  .sidebar-block li { margin-bottom: 0.5rem; }
-  .sidebar-block a { color: var(--gray); text-decoration: none; }
-  .sidebar-block a:hover { color: var(--blue); }
-  .tag-pill {
-    display: inline-block;
-    background: var(--light);
-    color: var(--navy);
-    padding: 0.2rem 0.65rem;
-    border-radius: 12px;
-    font-size: 0.78rem;
-    margin: 0.2rem 0.2rem 0.2rem 0;
-    border: 1px solid #BFDBFE;
-  }
-  .github-link {
-    display: block;
-    background: var(--navy);
-    color: white !important;
-    text-align: center;
-    padding: 0.7rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.88rem;
-    margin-top: 0.5rem;
-  }
-  .github-link:hover { background: var(--blue); }
+li{
+    margin-bottom:8px;
+}
 
-  /* FOOTER */
-  footer {
-    background: var(--navy);
-    color: #93C5FD;
-    text-align: center;
-    padding: 2rem;
-    font-family: 'Calibri', sans-serif;
-    font-size: 0.88rem;
-    margin-top: 3rem;
-  }
-  footer a { color: var(--sky); }
+.box{
+    background:#f8fafc;
+    border-left:4px solid #2563eb;
+    padding:18px;
+    margin:20px 0;
+}
+
+footer{
+    border-top:1px solid #e5e5e5;
+    text-align:center;
+    padding:25px;
+    color:#666;
+    font-size:14px;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+header h1{
+    font-size:32px;
+}
+h2{
+    font-size:26px;
+}
+p,ul{
+    font-size:17px;
+}
+}
 </style>
 </head>
+
 <body>
 
-<!-- NAV -->
+<!-- NAVBAR -->
 <nav>
-  <span class="brand">Data Engineering</span>
-  <a href="#architecture">Architecture</a>
-  <a href="#etl">ETL Pipeline</a>
-  <a href="#incremental">Incremental Loading</a>
-  <a href="#schema">Star Schema</a>
-  <span class="tag-nav">Technical Blog</span>
+<a href="#architecture">Architecture</a>
+<a href="#schema">Star Schema</a>
+<a href="#etl">ETL Pipeline</a>
+<a href="#incremental">Incremental Loading</a>
+<a href="#insights">Business Insights</a>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="series-tag">Data Warehouse Series</div>
-  <h1>Incremental ETL Pipeline with <em>Star Schema</em> Design</h1>
-  <p class="subtitle">How I built a production-grade data warehouse on Amazon e-commerce data — going beyond standard batch loading with a watermark-based incremental strategy.</p>
-  <div class="meta">
-    <span>📅 April 2026</span>
-    <span>⏱ 10 min read</span>
-    <span>🔧 Technical Deep Dive</span>
-    <span>📊 128K+ Records</span>
-  </div>
+<!-- HEADER -->
+<header>
+<h1>Incremental ETL Pipeline with Star Schema</h1>
+
+<p>
+A Data Warehouse Project using Amazon Sales Data
+</p>
+
+<div class="meta">
+By K. Asritha • April 2026
+</div>
+</header>
+
+<!-- CONTENT -->
+<div class="container">
+
+<h2>Introduction</h2>
+
+<p>
+In this project, I built a data warehouse using Amazon e-commerce sales data.
+The main objective was to create an ETL pipeline that extracts data from CSV files,
+transforms the raw data, and loads it into PostgreSQL using a star schema design.
+</p>
+
+<p>
+I also implemented incremental loading using watermark strategy so that only new records are loaded in future runs.
+</p>
+
+<h2 id="architecture">Architecture</h2>
+
+<div class="box">
+CSV Files → Python → Data Cleaning → PostgreSQL → SQL Analysis
 </div>
 
-<!-- MAIN LAYOUT -->
-<div class="container">
-  <article>
+<p><strong>Tools Used:</strong></p>
 
-    <!-- INTRO -->
-    <p>
-      Most data warehouse courses teach you the fundamentals: build a star schema, write an ETL, load your data. And that's valuable. But when I sat down to actually implement this on a real dataset — 128,000+ Amazon India sales records — I hit a wall that the textbook didn't prepare me for.
-    </p>
-    <p>
-      What happens when the data grows? What happens on the second run? Do I re-load all 128,000 rows every single time? That would be wasteful, fragile, and nothing like how real production pipelines work.
-    </p>
-    <p>
-      That question led me to implement <strong>incremental loading with a watermark strategy</strong> — a technique that goes well beyond the standard syllabus. This post walks through the entire project: why I made each design decision, how the star schema was constructed, and how the incremental ETL actually works.
-    </p>
+<ul>
+<li>Python</li>
+<li>Pandas</li>
+<li>SQLAlchemy</li>
+<li>PostgreSQL</li>
+<li>pgAdmin</li>
+</ul>
 
-    <div class="callout navy">
-      <div class="label">🔗 GitHub Repository</div>
-      <p><strong>Full project code:</strong> <a href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse" target="_blank">github.com/asritha353/incremental-etl-amazon-sales-datawarehouse</a></p>
-    </div>
+<h2 id="schema">Star Schema Design</h2>
 
-    <hr />
+<p>
+The warehouse was designed using one fact table and multiple dimension tables.
+</p>
 
-    <!-- SECTION 1 -->
-    <h2 id="problem">The Problem with Standard Batch ETL</h2>
+<ul>
+<li>fact_sales</li>
+<li>dim_date</li>
+<li>dim_product</li>
+<li>dim_location</li>
+<li>dim_order_status</li>
+<li>dim_fulfilment</li>
+</ul>
 
-    <p>
-      A typical introductory ETL pipeline works like this: read the CSV, clean the data, insert into the database. Simple. But it hides a serious flaw — every time the pipeline runs, it reloads <em>everything</em>.
-    </p>
+<p>
+This design improves reporting and query performance.
+</p>
 
-    <div class="compare">
-      <div class="compare-box">
-        <div class="cb-header" style="background: #EF4444;">❌ Standard Batch ETL</div>
-        <div class="cb-body" style="background: #FFF1F2;">
-          <p>Re-loads all rows every run</p>
-          <p>Scales linearly with data growth</p>
-          <p>No checkpoint — crashes restart from zero</p>
-          <p>Wastes compute on unchanged records</p>
-          <p>Cannot run multiple times safely</p>
-        </div>
-      </div>
-      <div class="compare-box">
-        <div class="cb-header" style="background: #16A34A;">✅ Incremental ETL (This Project)</div>
-        <div class="cb-body" style="background: #F0FDF4;">
-          <p>Only loads records newer than last run</p>
-          <p>Scales with <em>new data volume</em>, not total</p>
-          <p>Watermark checkpoint survives crashes</p>
-          <p>Idempotent — safe to re-run</p>
-          <p>Production-grade pattern used at scale</p>
-        </div>
-      </div>
-    </div>
+<h2 id="etl">ETL Pipeline</h2>
 
-    <p>
-      For our 128,000-row Amazon dataset, this distinction might seem minor — but the design principle scales to billions of rows. Companies like Amazon, Swiggy, and Flipkart run incremental pipelines because reloading petabytes of data nightly is simply not feasible.
-    </p>
+<h3>Extract</h3>
 
-    <hr />
+<p>
+The dataset was loaded from CSV files using Pandas.
+</p>
 
-    <!-- SECTION 2 -->
-    <h2 id="dataset">Dataset Overview</h2>
-    <p>
-      The dataset came from Kaggle — a real Amazon India sales export with 7 CSV files. The primary file, <strong>Amazon Sale Report.csv</strong>, contains 128,000+ order records spanning April–June 2022.
-    </p>
+<h3>Transform</h3>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>File</th><th>Records</th><th>Key Information</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>Amazon Sale Report.csv</code></td><td>128,000+</td><td>Order ID, date, status, category, qty, amount, city, state, B2B flag</td></tr>
-          <tr><td><code>Sale Report.csv</code></td><td>13,000</td><td>Product SKU, stock levels, category, size, color</td></tr>
-          <tr><td><code>International sale Report.csv</code></td><td>2,000</td><td>Cross-border orders with customer details</td></tr>
-          <tr><td><code>May-2022.csv</code></td><td>3,000</td><td>May 2022 sales snapshot</td></tr>
-          <tr><td><code>P&amp;L March 2021.csv</code></td><td>4,000</td><td>Profit and loss records</td></tr>
-          <tr><td><code>Expense IIGF.csv</code></td><td>Small</td><td>Operational expense records</td></tr>
-        </tbody>
-      </table>
-    </div>
+<ul>
+<li>Renamed columns</li>
+<li>Converted date formats</li>
+<li>Handled missing values</li>
+<li>Created dimension tables</li>
+</ul>
 
-    <p>
-      The raw data had several quality issues I had to handle: dates stored as strings (<code>'04-30-22'</code>), column names with spaces and hyphens, missing <code>Amount</code> values, and inconsistent city/state capitalisation. All of these were addressed in the Transform phase.
-    </p>
+<h3>Load</h3>
 
-    <hr />
+<p>
+Dimension tables were loaded first, followed by the fact table into PostgreSQL.
+</p>
 
-    <!-- SECTION 3 -->
-    <h2 id="schema">Designing the Star Schema</h2>
-    <p>
-      The central question in dimensional modelling is: <em>what is the business event I want to measure?</em> In this project, it's each individual order line — a customer purchasing a product on a specific date, shipped to a specific location, with a specific fulfilment method.
-    </p>
+<h2 id="incremental">Incremental Loading</h2>
 
-    <h3>Why a Star Schema?</h3>
-    <p>
-      A star schema separates <strong>facts</strong> (measurable numbers like quantity and revenue) from <strong>dimensions</strong> (descriptive context like product category, date, location). This separation makes analytical queries dramatically faster and more readable than a flat denormalised table.
-    </p>
+<p>
+Instead of loading all rows every time, I used watermark logic.
+The last loaded date is stored, and only new records are processed in the next run.
+</p>
 
-    <h3>The Final Schema: 1 Fact + 5 Dimensions</h3>
+<div class="box">
+Run 1: Load all records<br>
+Run 2: Load only new records<br>
+Run 3+: Continue incremental loading
+</div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Table</th><th>Type</th><th>Key Columns</th><th>Why It Exists</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>fact_sales</code></td><td>Fact</td><td>quantity, amount_inr, is_b2b, load_timestamp</td><td>One row per order. Holds measures + foreign keys to all dims.</td></tr>
-          <tr><td><code>dim_date</code></td><td>Dimension</td><td>date_key, full_date, day, month, quarter, year, is_weekend</td><td>Enables time-series analysis, quarter comparisons, weekend vs weekday splits.</td></tr>
-          <tr><td><code>dim_product</code></td><td>Dimension</td><td>sku, style, category, size, asin</td><td>Category-level sales breakdowns, size analysis.</td></tr>
-          <tr><td><code>dim_location</code></td><td>Dimension</td><td>city, state, postal_code, country</td><td>Geographic sales distribution — which states generate most revenue.</td></tr>
-          <tr><td><code>dim_order_status</code></td><td>Dimension</td><td>status_name, status_category</td><td>Simplifies raw status strings into Completed / In Transit / Cancelled.</td></tr>
-          <tr><td><code>dim_fulfilment</code></td><td>Dimension</td><td>fulfilment_type, service_level, fulfilled_by</td><td>Compare Merchant vs Amazon-fulfilled orders.</td></tr>
-        </tbody>
-      </table>
-    </div>
+<p>
+This reduces execution time and improves efficiency.
+</p>
 
-    <div class="callout teal">
-      <div class="label">💡 Design Decision: Surrogate Keys</div>
-      <p>Every dimension table uses a surrogate primary key (auto-increment integer) rather than natural keys like SKU or order ID. Natural keys can change, contain special characters, or be inconsistent across sources. Surrogate keys are stable, compact, and join faster — this is standard practice in production data warehouses.</p>
-    </div>
+<h2 id="insights">Business Insights</h2>
 
-    <hr />
+<ul>
+<li>Maharashtra had highest sales</li>
+<li>April 2022 was peak sales month</li>
+<li>Set category generated highest revenue</li>
+<li>B2C orders were more than B2B</li>
+<li>Cancelled orders were high</li>
+</ul>
 
-    <!-- SECTION 4 -->
-    <h2 id="etl">The ETL Pipeline</h2>
-    <p>
-      The pipeline is implemented in Python using <strong>Pandas</strong> for transformation and <strong>SQLAlchemy</strong> for database operations. Each phase is in its own module for maintainability.
-    </p>
+<h2>Challenges Faced</h2>
 
-    <h3>Phase 1: Extract</h3>
-    <p>
-      Reading raw CSV files into DataFrames. The main file requires <code>low_memory=False</code> to handle the mixed-type columns:
-    </p>
+<ul>
+<li>Messy raw column names</li>
+<li>Missing values in amount column</li>
+<li>Date conversion issues</li>
+<li>Foreign key loading order</li>
+</ul>
 
-<pre><code><span class="cm"># etl/extract.py</span>
-<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<h2>Conclusion</h2>
 
-<span class="kw">def</span> <span class="fn">extract_amazon_sales</span>():
-    df = pd.<span class="fn">read_csv</span>(<span class="st">'data/raw/Amazon Sale Report.csv'</span>,
-                      low_memory=<span class="kw">False</span>)
-    <span class="fn">print</span>(<span class="st">f'Extracted {len(df)} rows'</span>)
-    <span class="kw">return</span> df
-</code></pre>
+<p>
+This project helped me understand ETL pipelines, dimensional modelling,
+PostgreSQL data warehousing, and incremental loading techniques used in real systems.
+</p>
 
-    <h3>Phase 2: Transform</h3>
-    <p>
-      This is the most complex phase. Twenty-three raw columns needed renaming, dates needed parsing, nulls needed handling, and five dimension DataFrames needed to be built from the cleaned main DataFrame.
-    </p>
-    <p>Key transformations:</p>
-    <ul>
-      <li>Rename all 23 columns to clean snake_case names</li>
-      <li>Convert date strings: <code>pd.to_datetime(df['order_date'], format='%m-%d-%y', errors='coerce')</code></li>
-      <li>Fill missing <code>amount_inr</code> with 0; fill missing cities with 'UNKNOWN'</li>
-      <li>Create <code>status_category</code> (Completed / In Transit / Cancelled) from raw status strings</li>
-      <li>Build dimension DataFrames with deduplicated rows and assigned surrogate keys</li>
-    </ul>
+<p>
+It was a practical learning experience in data engineering concepts.
+</p>
 
-<pre><code><span class="cm"># Build dim_date from the cleaned DataFrame</span>
-<span class="kw">def</span> <span class="fn">build_dim_date</span>(df):
-    dates = df[<span class="st">'order_date'</span>].drop_duplicates()
-    dim = pd.<span class="fn">DataFrame</span>({<span class="st">'full_date'</span>: dates})
-    dim[<span class="st">'date_key'</span>]   = dim[<span class="st">'full_date'</span>].dt.<span class="fn">strftime</span>(<span class="st">'%Y%m%d'</span>).<span class="fn">astype</span>(int)
-    dim[<span class="st">'day'</span>]       = dim[<span class="st">'full_date'</span>].dt.day
-    dim[<span class="st">'month'</span>]     = dim[<span class="st">'full_date'</span>].dt.month
-    dim[<span class="st">'quarter'</span>]   = dim[<span class="st">'full_date'</span>].dt.quarter
-    dim[<span class="st">'year'</span>]      = dim[<span class="st">'full_date'</span>].dt.year
-    dim[<span class="st">'is_weekend'</span>]= dim[<span class="st">'full_date'</span>].dt.dayofweek >= 5
-    <span class="kw">return</span> dim
-</code></pre>
-
-    <h3>Phase 3: Load</h3>
-    <p>
-      Loading order is critical: dimensions must be fully inserted before the fact table, because the fact table's foreign keys reference dimension primary keys. Loading in the wrong order triggers FK constraint violations.
-    </p>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body"><h4>dim_date → dim_product → dim_location → dim_order_status → dim_fulfilment</h4><p>All five dimensions loaded first with SQLAlchemy <code>to_sql()</code>, chunk size 1000.</p></div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body"><h4>Join surrogate keys onto main DataFrame</h4><p>Merge each dim's key column back onto the cleaned data using <code>pd.merge()</code>.</p></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body"><h4>Load fact_sales</h4><p>Insert the final fact DataFrame — now containing FK references — in chunks of 500 rows.</p></div>
-      </div>
-    </div>
-
-    <hr />
-
-    <!-- SECTION 5 — INCREMENTAL (THE ADVANCED PART) -->
-    <h2 id="incremental">Incremental Loading — The Advanced Part</h2>
-
-    <p>
-      This is the technique that goes beyond what's typically covered in a data warehouse course — and it's what I'm most proud of in this project.
-    </p>
-
-    <div class="callout orange">
-      <div class="label">⭐ Beyond the Syllabus</div>
-      <p>Standard courses teach full ETL loads — process everything, every time. Incremental loading is what <em>production</em> pipelines actually use. It's the difference between a student project and a real engineering solution.</p>
-    </div>
-
-    <h3>The Watermark Strategy</h3>
-    <p>
-      A <strong>watermark</strong> is a saved checkpoint that records how far the ETL has processed. In this project, it's the maximum <code>order_date</code> from the last successful pipeline run, stored in a dedicated table:
-    </p>
-
-<pre><code><span class="cm">-- etl_watermark table</span>
-<span class="kw">CREATE TABLE</span> etl_watermark (
-    table_name       <span class="kw">VARCHAR</span>(100) <span class="kw">PRIMARY KEY</span>,
-    last_loaded_date <span class="kw">DATE</span>,
-    last_run_at      <span class="kw">TIMESTAMP</span>
-);
-</code></pre>
-
-    <h3>How Each Run Works</h3>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Run</th><th>What Happens</th><th>Records Processed</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Run 1 (First time)</strong></td><td>No watermark found → load ALL historical data → save watermark = max date</td><td>128,000+ rows</td></tr>
-          <tr><td><strong>Run 2 (Next day)</strong></td><td>Read watermark → filter <code>WHERE order_date &gt; watermark</code> → load only new rows → update watermark</td><td>~500 new rows</td></tr>
-          <tr><td><strong>Run 3+ (Ongoing)</strong></td><td>Same pattern — only new data since last checkpoint is ever touched</td><td>0 to N new rows</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-<pre><code><span class="cm"># etl/incremental.py</span>
-<span class="kw">def</span> <span class="fn">incremental_load_facts</span>(df_clean):
-    watermark = <span class="fn">get_watermark</span>(<span class="st">'fact_sales'</span>)
-
-    <span class="kw">if</span> watermark <span class="kw">is None</span>:
-        <span class="cm"># First run: load everything</span>
-        new_data = df_clean
-    <span class="kw">else</span>:
-        <span class="cm"># Subsequent runs: only new records</span>
-        new_data = df_clean[
-            df_clean[<span class="st">'order_date'</span>].dt.date > watermark
-        ]
-
-    <span class="kw">if</span> <span class="fn">len</span>(new_data) > 0:
-        <span class="fn">load_fact</span>(new_data)
-        max_date = new_data[<span class="st">'order_date'</span>].<span class="fn">max</span>().date()
-        <span class="fn">update_watermark</span>(<span class="st">'fact_sales'</span>, max_date)
-    <span class="kw">else</span>:
-        <span class="fn">print</span>(<span class="st">'No new data. Pipeline is up to date.'</span>)
-</code></pre>
-
-    <p>
-      The <code>get_watermark()</code> and <code>update_watermark()</code> functions use SQLAlchemy's <code>text()</code> with an <code>ON CONFLICT DO UPDATE</code> (PostgreSQL upsert) to atomically update the checkpoint. This ensures the watermark is always in sync with what was actually loaded.
-    </p>
-
-    <div class="callout teal">
-      <div class="label">💡 Why This Matters</div>
-      <p>If the pipeline crashes mid-run, the watermark is <em>not</em> updated. The next run will re-process the same records — which is safe because of idempotent loading — and then save a valid checkpoint. The watermark only advances when a run completes successfully.</p>
-    </div>
-
-    <hr />
-
-    <!-- SECTION 6 -->
-    <h2 id="insights">Business Insights from the Warehouse</h2>
-    <p>
-      Once the warehouse was loaded, I ran SQL queries against the star schema to extract real business insights. This is the payoff for all the engineering work — the schema makes these queries simple and fast.
-    </p>
-
-<pre><code><span class="cm">-- Revenue by product category</span>
-<span class="kw">SELECT</span> p.category,
-       <span class="fn">SUM</span>(f.amount_inr) <span class="kw">AS</span> total_revenue,
-       <span class="fn">COUNT</span>(*) <span class="kw">AS</span> orders
-<span class="kw">FROM</span> fact_sales f
-<span class="kw">JOIN</span> dim_product p <span class="kw">ON</span> f.product_key = p.product_key
-<span class="kw">GROUP BY</span> p.category
-<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>;
-</code></pre>
-
-    <p>Key findings from the data:</p>
-    <ul>
-      <li><strong>Set</strong> was the highest-revenue category, followed by <strong>Kurta</strong> and <strong>Western Dress</strong></li>
-      <li><strong>Maharashtra</strong> accounted for nearly 30% of all domestic orders</li>
-      <li>Approximately <strong>41% of orders</strong> were in a Cancelled state — a significant operational signal</li>
-      <li><strong>B2B orders</strong> made up only ~8% by volume but represented a disproportionate share of high-value transactions</li>
-      <li><strong>April 2022</strong> was the peak sales month in the dataset</li>
-    </ul>
-
-    <hr />
-
-    <!-- SECTION 7 -->
-    <h2>Challenges and What I Learned</h2>
-
-    <h3>Data Quality is the Real Work</h3>
-    <p>
-      Roughly 70% of the implementation time was spent on the Transform phase. The raw data had 23 messy column names, dates in a non-standard format, missing monetary values, and city names in inconsistent cases. Real data is never clean — the Transform phase is where most real ETL engineering effort goes.
-    </p>
-
-    <h3>Foreign Key Loading Order</h3>
-    <p>
-      On my first attempt, I loaded the fact table before the dimensions were fully populated. PostgreSQL immediately threw a foreign key constraint violation. This forced me to think carefully about loading order and understand why constraints exist — not just how to work around them.
-    </p>
-
-    <h3>Incremental vs Idempotent</h3>
-    <p>
-      Incremental loading and idempotent loading are related but different concepts. Incremental means "only new data." Idempotent means "running it twice produces the same result as running it once." My implementation aims for both — the watermark ensures only new data is processed, and because we check for duplicates, re-running is safe.
-    </p>
-
-    <hr />
-
-    <!-- CONCLUSION -->
-    <h2>Conclusion</h2>
-    <p>
-      Building this project end-to-end — from a raw Kaggle CSV to a queryable star schema with production-grade incremental loading — gave me a much clearer picture of what data warehouse engineering actually involves.
-    </p>
-    <p>
-      The standard ETL you learn in a course is a starting point. What makes a pipeline production-ready is the infrastructure around it: checkpointing, idempotency, error handling, data quality validation, and load order awareness. This project implements the foundational version of all of these.
-    </p>
-    <p>
-      The incremental watermark strategy in particular is something I'd never encountered in coursework — but it's standard practice in every data engineering team I've read about. Adding it to this project means the pipeline is not just academically correct, but architecturally sound.
-    </p>
-
-    <div class="callout navy">
-      <div class="label">🔗 Explore the Full Project</div>
-      <p><strong>GitHub:</strong> <a href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse" target="_blank">github.com/asritha353/incremental-etl-amazon-sales-datawarehouse</a></p>
-      <p style="margin-top:0.5rem; font-size:0.93rem; color:var(--muted);">Full Python code, SQL DDL scripts, analysis queries, and project documentation.</p>
-    </div>
-
-  </article>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-block">
-      <h4>Contents</h4>
-      <ul>
-        <li><a href="#problem">The Problem with Batch ETL</a></li>
-        <li><a href="#dataset">Dataset Overview</a></li>
-        <li><a href="#schema">Star Schema Design</a></li>
-        <li><a href="#etl">The ETL Pipeline</a></li>
-        <li><a href="#incremental">Incremental Loading ⭐</a></li>
-        <li><a href="#insights">Business Insights</a></li>
-      </ul>
-    </div>
-
-    <div class="sidebar-block">
-      <h4>Technologies</h4>
-      <span class="tag-pill">Python 3.10</span>
-      <span class="tag-pill">PostgreSQL 15</span>
-      <span class="tag-pill">Pandas</span>
-      <span class="tag-pill">SQLAlchemy</span>
-      <span class="tag-pill">pgAdmin 4</span>
-      <span class="tag-pill">Jupyter</span>
-    </div>
-
-    <div class="sidebar-block">
-      <h4>Key Concepts</h4>
-      <span class="tag-pill">Star Schema</span>
-      <span class="tag-pill">Incremental ETL</span>
-      <span class="tag-pill">Watermark Strategy</span>
-      <span class="tag-pill">Surrogate Keys</span>
-      <span class="tag-pill">Dimensional Modelling</span>
-      <span class="tag-pill">Data Quality</span>
-    </div>
-
-    <div class="sidebar-block">
-      <h4>GitHub</h4>
-      <a class="github-link" href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse" target="_blank">🔗 View Project Code</a>
-    </div>
-
-    <div class="sidebar-block">
-      <h4>Dataset Stats</h4>
-      <ul>
-        <li>📦 128,000+ order records</li>
-        <li>📁 7 CSV source files</li>
-        <li>📊 1 fact + 5 dimension tables</li>
-        <li>🗓 April – June 2022</li>
-        <li>💰 Currency: INR</li>
-      </ul>
-    </div>
-  </aside>
 </div>
 
 <footer>
-  <p>Incremental ETL Pipeline with Star Schema · Data Warehouse Course Project · April 2026</p>
-  <p style="margin-top:0.5rem;"><a href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse">GitHub Repository</a></p>
+Created by K. Asritha • Data Warehouse Project
 </footer>
 
 </body>
