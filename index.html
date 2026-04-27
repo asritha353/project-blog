@@ -27,7 +27,7 @@ scroll-behavior:smooth;
 }
 
 body{
-font-family:Georgia, serif;
+font-family:Georgia,serif;
 background:var(--bg);
 color:#1f2937;
 line-height:1.8;
@@ -36,9 +36,8 @@ line-height:1.8;
 nav{
 position:sticky;
 top:0;
-z-index:1000;
-background:#ffffffee;
-backdrop-filter:blur(8px);
+z-index:999;
+background:#ffffffef;
 border-bottom:1px solid var(--border);
 padding:14px 28px;
 display:flex;
@@ -50,15 +49,14 @@ align-items:center;
 .brand{
 font-family:Arial,sans-serif;
 font-weight:700;
-font-size:17px;
-color:var(--dark);
+font-size:18px;
 margin-right:auto;
 }
 
 nav a{
+text-decoration:none;
 font-family:Arial,sans-serif;
 font-size:14px;
-text-decoration:none;
 color:#475569;
 }
 
@@ -67,14 +65,14 @@ color:var(--primary);
 }
 
 header{
-max-width:980px;
+max-width:1000px;
 margin:auto;
-padding:75px 20px 45px;
+padding:70px 20px 45px;
 text-align:center;
 }
 
 header h1{
-font-size:54px;
+font-size:56px;
 line-height:1.2;
 color:var(--dark);
 }
@@ -87,23 +85,22 @@ header p{
 font-size:20px;
 color:var(--muted);
 max-width:760px;
-margin:18px auto 0;
+margin:18px auto;
 }
 
 .meta{
-margin-top:18px;
 font-family:Arial,sans-serif;
 font-size:14px;
 color:#64748b;
 }
 
 .wrapper{
-max-width:1200px;
+max-width:1280px;
 margin:auto;
 padding:0 20px 60px;
 display:grid;
-grid-template-columns:minmax(0,1fr) 300px;
-gap:40px;
+grid-template-columns:minmax(0,1fr) 290px;
+gap:35px;
 }
 
 article{
@@ -115,7 +112,7 @@ box-shadow:0 10px 30px rgba(0,0,0,.05);
 
 aside{
 position:sticky;
-top:88px;
+top:85px;
 height:fit-content;
 }
 
@@ -131,18 +128,18 @@ margin-bottom:20px;
 font-family:Arial,sans-serif;
 font-size:13px;
 text-transform:uppercase;
-letter-spacing:.8px;
+letter-spacing:1px;
 color:var(--primary);
-margin-bottom:12px;
+margin-bottom:14px;
 }
 
 .card a{
 display:block;
+text-decoration:none;
 font-family:Arial,sans-serif;
 font-size:14px;
-text-decoration:none;
-color:#475569;
 margin-bottom:10px;
+color:#475569;
 }
 
 .card a:hover{
@@ -153,24 +150,24 @@ color:var(--primary);
 display:inline-block;
 padding:6px 10px;
 border-radius:20px;
-margin:4px;
 font-family:Arial,sans-serif;
 font-size:12px;
+margin:4px;
 background:var(--soft);
 color:var(--primary);
 }
 
 h2{
 font-size:34px;
-margin-top:42px;
+margin-top:40px;
 margin-bottom:14px;
 color:var(--dark);
 }
 
 h3{
 font-size:24px;
-margin-top:28px;
-margin-bottom:12px;
+margin-top:26px;
+margin-bottom:10px;
 color:var(--primary);
 }
 
@@ -189,18 +186,9 @@ li{
 margin-bottom:8px;
 }
 
-.box{
-background:var(--soft);
-border-left:4px solid var(--primary);
-padding:18px;
-border-radius:10px;
-margin:22px 0;
-}
-
 pre{
 background:#f8fafc;
 border:1px solid #e2e8f0;
-color:#111827;
 padding:18px;
 border-radius:12px;
 overflow:auto;
@@ -209,26 +197,24 @@ line-height:1.6;
 margin:18px 0;
 }
 
-table{
-width:100%;
-border-collapse:collapse;
+.box{
+background:var(--soft);
+padding:18px;
+border-left:4px solid var(--primary);
+border-radius:10px;
 margin:20px 0;
-font-size:16px;
 }
 
-th,td{
+img{
+width:100%;
+border-radius:14px;
+margin:18px 0;
 border:1px solid #e5e7eb;
-padding:12px;
-text-align:left;
-}
-
-th{
-background:#f8fafc;
 }
 
 footer{
 text-align:center;
-padding:34px;
+padding:35px;
 font-family:Arial,sans-serif;
 font-size:14px;
 color:#64748b;
@@ -256,9 +242,6 @@ font-size:34px;
 h2{
 font-size:28px;
 }
-p,ul{
-font-size:17px;
-}
 }
 </style>
 </head>
@@ -268,11 +251,9 @@ font-size:17px;
 <nav>
 <div class="brand">Data Warehouse Project</div>
 <a href="#intro">Intro</a>
-<a href="#dataset">Dataset</a>
-<a href="#architecture">Architecture</a>
 <a href="#schema">Schema</a>
 <a href="#etl">ETL</a>
-<a href="#incremental">Incremental</a>
+<a href="#watermark">Incremental</a>
 <a href="#insights">Insights</a>
 <a href="#conclusion">Conclusion</a>
 </nav>
@@ -280,9 +261,9 @@ font-size:17px;
 <header>
 <h1>Incremental ETL Pipeline with <span>Star Schema</span></h1>
 <p>
-Complete Data Warehouse project using Amazon sales data, Python ETL processing, PostgreSQL, and incremental loading strategy.
+Building a complete Data Warehouse using Amazon sales data, PostgreSQL, Python ETL automation, and incremental loading strategy.
 </p>
-<div class="meta">By K. Asritha • April 2026</div>
+<div class="meta">By K. Asritha • Final Year Project</div>
 </header>
 
 <div class="wrapper">
@@ -290,45 +271,41 @@ Complete Data Warehouse project using Amazon sales data, Python ETL processing, 
 <article>
 
 <section id="intro">
-<h2>Introduction</h2>
-<p>
-This project focuses on building a complete data warehouse using Amazon e-commerce sales data. Raw CSV data was transformed into structured tables using Python and loaded into PostgreSQL using star schema design.
-</p>
-<p>
-To improve efficiency, incremental loading was implemented so that only new records are loaded during future executions.
-</p>
-</section>
+<h2>Project Overview</h2>
 
-<section id="dataset">
-<h2>Dataset Description</h2>
 <p>
-The dataset contains Amazon India sales transactions including order details, quantity, product category, amount, state, city, and fulfilment details.
+This project demonstrates the end-to-end implementation of a Data Warehouse solution using Amazon e-commerce sales data. Raw transactional CSV files were transformed into analytical tables using ETL processing and stored in PostgreSQL using dimensional modelling.
 </p>
 
-<table>
-<tr><th>Column</th><th>Description</th></tr>
-<tr><td>Order ID</td><td>Unique Order Number</td></tr>
-<tr><td>Date</td><td>Order Date</td></tr>
-<tr><td>Category</td><td>Product Category</td></tr>
-<tr><td>Qty</td><td>Quantity</td></tr>
-<tr><td>Amount</td><td>Sales Amount</td></tr>
-<tr><td>State</td><td>Customer State</td></tr>
-<tr><td>Status</td><td>Order Status</td></tr>
-</table>
-</section>
+<p>
+Instead of reloading the full dataset every time, an incremental loading mechanism was implemented using a watermark table.
+</p>
 
-<section id="architecture">
-<h2>System Architecture</h2>
 <div class="box">
-CSV Files → Python → Data Cleaning → PostgreSQL Warehouse → SQL Analysis
+Source CSV → Python ETL → PostgreSQL Star Schema → SQL Analytics
 </div>
-<p>
-The project follows ETL architecture where source files are extracted, transformed, and loaded into a warehouse for reporting.
-</p>
+
+</section>
+
+<section>
+<h2>Dataset Information</h2>
+
+<ul>
+<li>128,975 sales records</li>
+<li>Product category and quantity</li>
+<li>State / location data</li>
+<li>Order status and fulfilment details</li>
+<li>Amount in INR</li>
+</ul>
+
 </section>
 
 <section id="schema">
-<h2>Star Schema Design</h2>
+<h2>Warehouse Schema Design</h2>
+
+<p>
+The warehouse follows star schema architecture with one fact table and multiple dimension tables.
+</p>
 
 <ul>
 <li>fact_sales</li>
@@ -336,86 +313,72 @@ The project follows ETL architecture where source files are extracted, transform
 <li>dim_product</li>
 <li>dim_location</li>
 <li>dim_order_status</li>
-<li>dim_fulfilment</li>
+<li>dim_fulfillment</li>
+<li>etl_watermark</li>
 </ul>
 
-<h3>Create Product Dimension</h3>
+<img src="schema-tables.png" alt="Schema Tables">
 
-<pre>
-CREATE TABLE dim_product(
- product_key SERIAL PRIMARY KEY,
- sku VARCHAR(50),
- category VARCHAR(50),
- size VARCHAR(20)
-);
-</pre>
-
-<h3>Create Fact Table</h3>
-
-<pre>
-CREATE TABLE fact_sales(
- sales_key SERIAL PRIMARY KEY,
- product_key INT,
- date_key INT,
- quantity INT,
- amount_inr NUMERIC(12,2)
-);
-</pre>
 </section>
 
 <section id="etl">
-<h2>ETL Pipeline</h2>
+<h2>ETL Pipeline Execution</h2>
 
-<h3>Extract</h3>
+<p>
+The ETL process performs extraction, transformation, dimension loading, fact loading, and watermark update.
+</p>
+
 <pre>
-import pandas as pd
-df = pd.read_csv("Amazon Sale Report.csv")
+python main.py
 </pre>
 
-<h3>Transform</h3>
-<pre>
-df.columns = df.columns.str.lower()
-df['date'] = pd.to_datetime(df['date'])
-df['amount'] = df['amount'].fillna(0)
-df = df.drop_duplicates()
-</pre>
+<img src="etl-success.png" alt="ETL Success">
 
-<h3>Load</h3>
-<pre>
-from sqlalchemy import create_engine
+<p>
+The pipeline successfully loaded all dimension tables and inserted 128,975 rows into fact_sales during the initial run.
+</p>
 
-engine = create_engine(
-'postgresql://postgres:password@localhost:5432/amazon_dw'
-)
-
-df.to_sql('staging_sales', engine, if_exists='replace')
-</pre>
 </section>
 
-<section id="incremental">
+<section>
+<h2>Fact Table Loaded Data</h2>
+
+<p>
+Below is a preview of the populated fact_sales table with surrogate keys and metrics.
+</p>
+
+<img src="fact-table-data.png" alt="Fact Table Data">
+
+</section>
+
+<section>
+<h2>Validation Checks</h2>
+
+<p>
+Record counts were verified after loading to ensure completeness of warehouse tables.
+</p>
+
+<img src="row-counts.png" alt="Row Counts">
+
+</section>
+
+<section id="watermark">
 <h2>Incremental Loading using Watermark</h2>
 
-<pre>
-CREATE TABLE etl_watermark(
- table_name VARCHAR(50),
- last_loaded_date DATE
-);
-</pre>
+<p>
+A watermark table stores the latest successfully loaded date. Future executions only load new rows after that date.
+</p>
 
 <pre>
-SELECT last_loaded_date
-FROM etl_watermark
-WHERE table_name='fact_sales';
+SELECT * FROM etl_watermark;
 </pre>
 
-<pre>
-new_df = df[df['date'] > last_loaded_date]
-</pre>
+<img src="watermark.png" alt="Watermark Table">
 
 <div class="box">
-Run 1 → Full Load<br>
-Run 2 → Only New Rows<br>
-Future Runs → Incremental Load
+First Run → Full Load<br>
+Next Runs → Only New Rows<br>
+Improves Speed & Efficiency
 </div>
 
 </section>
@@ -423,52 +386,61 @@ Future Runs → Incremental Load
 <section id="insights">
 <h2>Business Insights</h2>
 
-<pre>
-SELECT state,
-SUM(amount_inr)
-FROM fact_sales
-GROUP BY state
-ORDER BY SUM(amount_inr) DESC;
-</pre>
+<p>
+Analytical SQL queries were executed on the warehouse to generate business insights.
+</p>
+
+<h3>Top Revenue Categories</h3>
+
+<img src="analytics-query.png" alt="Business Insights">
 
 <ul>
-<li>Maharashtra generated highest revenue</li>
-<li>April recorded peak monthly sales</li>
-<li>Set category was top selling category</li>
-<li>B2C orders were higher than B2B</li>
+<li>Set category generated highest revenue</li>
+<li>Kurta ranked second</li>
+<li>Western Dress showed strong sales</li>
+<li>Traditional categories had lower demand</li>
 </ul>
 
 </section>
 
 <section>
-<h2>Challenges Faced</h2>
+<h2>Technologies Used</h2>
+
 <ul>
-<li>Null values in amount column</li>
-<li>Date conversion issues</li>
-<li>Dimension mapping</li>
-<li>Loading sequence dependencies</li>
+<li>Python</li>
+<li>Pandas</li>
+<li>PostgreSQL</li>
+<li>pgAdmin</li>
+<li>SQLAlchemy</li>
+<li>GitHub Pages</li>
 </ul>
+
 </section>
 
 <section>
 <h2>Learning Outcomes</h2>
+
 <ul>
-<li>Hands-on ETL development</li>
-<li>Warehouse schema design</li>
-<li>PostgreSQL data loading</li>
+<li>Real-world ETL workflow understanding</li>
+<li>Star schema design implementation</li>
+<li>Fact and dimension loading</li>
 <li>Incremental pipeline creation</li>
-<li>SQL analytical queries</li>
+<li>Business analytics using SQL</li>
 </ul>
+
 </section>
 
 <section id="conclusion">
 <h2>Conclusion</h2>
+
 <p>
-This project helped me understand real-world data engineering concepts including ETL workflow, dimensional modelling, incremental loading, and reporting.
+This project provided practical experience in data engineering concepts such as ETL automation, dimensional modelling, warehouse querying, and incremental data processing.
 </p>
+
 <p>
-It was a valuable practical experience in data warehouse development.
+It demonstrates how raw operational data can be converted into structured analytical systems for decision-making.
 </p>
+
 </section>
 
 </article>
@@ -477,29 +449,27 @@ It was a valuable practical experience in data warehouse development.
 
 <div class="card">
 <h4>Contents</h4>
-<a href="#intro">Introduction</a>
-<a href="#dataset">Dataset</a>
-<a href="#architecture">Architecture</a>
+<a href="#intro">Overview</a>
 <a href="#schema">Schema</a>
-<a href="#etl">ETL Pipeline</a>
-<a href="#incremental">Incremental Loading</a>
-<a href="#insights">Business Insights</a>
+<a href="#etl">ETL</a>
+<a href="#watermark">Incremental</a>
+<a href="#insights">Insights</a>
 <a href="#conclusion">Conclusion</a>
 </div>
 
 <div class="card">
-<h4>Technologies</h4>
+<h4>Tools</h4>
 <span class="tag">Python</span>
-<span class="tag">Pandas</span>
 <span class="tag">PostgreSQL</span>
-<span class="tag">SQLAlchemy</span>
+<span class="tag">Pandas</span>
 <span class="tag">pgAdmin</span>
+<span class="tag">GitHub</span>
 </div>
 
 <div class="card">
-<h4>Project Link</h4>
+<h4>Repository</h4>
 <a href="https://github.com/asritha353/incremental-etl-amazon-sales-datawarehouse" target="_blank">
-GitHub Repository
+View GitHub Project
 </a>
 </div>
 
