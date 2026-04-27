@@ -27,7 +27,7 @@ scroll-behavior:smooth;
 }
 
 body{
-font-family:Georgia,serif;
+font-family:Georgia, serif;
 background:var(--bg);
 color:#1f2937;
 line-height:1.8;
@@ -37,7 +37,8 @@ nav{
 position:sticky;
 top:0;
 z-index:999;
-background:#ffffffef;
+background:#ffffffee;
+backdrop-filter:blur(8px);
 border-bottom:1px solid var(--border);
 padding:14px 28px;
 display:flex;
@@ -48,9 +49,10 @@ align-items:center;
 
 .brand{
 font-family:Arial,sans-serif;
-font-weight:700;
 font-size:18px;
+font-weight:700;
 margin-right:auto;
+color:var(--dark);
 }
 
 nav a{
@@ -65,7 +67,7 @@ color:var(--primary);
 }
 
 header{
-max-width:1000px;
+max-width:980px;
 margin:auto;
 padding:70px 20px 45px;
 text-align:center;
@@ -104,7 +106,7 @@ gap:35px;
 }
 
 article{
-background:#fff;
+background:#ffffff;
 padding:45px;
 border-radius:18px;
 box-shadow:0 10px 30px rgba(0,0,0,.05);
@@ -117,7 +119,7 @@ height:fit-content;
 }
 
 .card{
-background:#fff;
+background:#ffffff;
 padding:22px;
 border-radius:18px;
 box-shadow:0 10px 30px rgba(0,0,0,.05);
@@ -127,10 +129,10 @@ margin-bottom:20px;
 .card h4{
 font-family:Arial,sans-serif;
 font-size:13px;
-text-transform:uppercase;
 letter-spacing:1px;
+text-transform:uppercase;
 color:var(--primary);
-margin-bottom:14px;
+margin-bottom:12px;
 }
 
 .card a{
@@ -150,9 +152,9 @@ color:var(--primary);
 display:inline-block;
 padding:6px 10px;
 border-radius:20px;
+margin:4px;
 font-family:Arial,sans-serif;
 font-size:12px;
-margin:4px;
 background:var(--soft);
 color:var(--primary);
 }
@@ -199,8 +201,8 @@ margin:18px 0;
 
 .box{
 background:var(--soft);
-padding:18px;
 border-left:4px solid var(--primary);
+padding:18px;
 border-radius:10px;
 margin:20px 0;
 }
@@ -208,13 +210,13 @@ margin:20px 0;
 img{
 width:100%;
 border-radius:14px;
-margin:18px 0;
 border:1px solid #e5e7eb;
+margin:18px 0;
 }
 
 footer{
 text-align:center;
-padding:35px;
+padding:34px;
 font-family:Arial,sans-serif;
 font-size:14px;
 color:#64748b;
@@ -231,7 +233,7 @@ header h1{
 font-size:42px;
 }
 article{
-padding:26px;
+padding:28px;
 }
 }
 
@@ -250,10 +252,10 @@ font-size:28px;
 
 <nav>
 <div class="brand">Data Warehouse Project</div>
-<a href="#intro">Intro</a>
+<a href="#overview">Overview</a>
 <a href="#schema">Schema</a>
 <a href="#etl">ETL</a>
-<a href="#watermark">Incremental</a>
+<a href="#incremental">Incremental</a>
 <a href="#insights">Insights</a>
 <a href="#conclusion">Conclusion</a>
 </nav>
@@ -261,7 +263,7 @@ font-size:28px;
 <header>
 <h1>Incremental ETL Pipeline with <span>Star Schema</span></h1>
 <p>
-Building a complete Data Warehouse using Amazon sales data, PostgreSQL, Python ETL automation, and incremental loading strategy.
+A complete Data Warehouse implementation using Amazon sales data, PostgreSQL, Python ETL automation, and incremental loading.
 </p>
 <div class="meta">By K. Asritha • Final Year Project</div>
 </header>
@@ -270,32 +272,32 @@ Building a complete Data Warehouse using Amazon sales data, PostgreSQL, Python E
 
 <article>
 
-<section id="intro">
+<section id="overview">
 <h2>Project Overview</h2>
 
 <p>
-This project demonstrates the end-to-end implementation of a Data Warehouse solution using Amazon e-commerce sales data. Raw transactional CSV files were transformed into analytical tables using ETL processing and stored in PostgreSQL using dimensional modelling.
+This project demonstrates how raw e-commerce transactional data can be transformed into a structured analytical warehouse. The source dataset was extracted from CSV files, cleaned using Python, and loaded into PostgreSQL using star schema modelling.
 </p>
 
 <p>
-Instead of reloading the full dataset every time, an incremental loading mechanism was implemented using a watermark table.
+To improve efficiency, a watermark-based incremental loading process was implemented so future runs load only newly arrived records.
 </p>
 
 <div class="box">
-Source CSV → Python ETL → PostgreSQL Star Schema → SQL Analytics
+CSV Source → Python ETL → PostgreSQL Warehouse → SQL Analytics
 </div>
 
 </section>
 
 <section>
-<h2>Dataset Information</h2>
+<h2>Dataset Summary</h2>
 
 <ul>
-<li>128,975 sales records</li>
-<li>Product category and quantity</li>
-<li>State / location data</li>
-<li>Order status and fulfilment details</li>
-<li>Amount in INR</li>
+<li>128,975 total sales records</li>
+<li>Order date, amount, category, quantity</li>
+<li>State and location information</li>
+<li>Order status and fulfilment mode</li>
+<li>Currency and B2B/B2C indicators</li>
 </ul>
 
 </section>
@@ -304,7 +306,7 @@ Source CSV → Python ETL → PostgreSQL Star Schema → SQL Analytics
 <h2>Warehouse Schema Design</h2>
 
 <p>
-The warehouse follows star schema architecture with one fact table and multiple dimension tables.
+The warehouse uses dimensional modelling with one central fact table and supporting dimensions.
 </p>
 
 <ul>
@@ -325,7 +327,7 @@ The warehouse follows star schema architecture with one fact table and multiple 
 <h2>ETL Pipeline Execution</h2>
 
 <p>
-The ETL process performs extraction, transformation, dimension loading, fact loading, and watermark update.
+The ETL pipeline extracts data, cleans records, loads dimensions, inserts facts, and updates the watermark table.
 </p>
 
 <pre>
@@ -335,7 +337,7 @@ python main.py
 <img src="etl-success.png" alt="ETL Success">
 
 <p>
-The pipeline successfully loaded all dimension tables and inserted 128,975 rows into fact_sales during the initial run.
+The initial execution loaded all dimension tables and inserted 128,975 rows into the fact table successfully.
 </p>
 
 </section>
@@ -344,7 +346,7 @@ The pipeline successfully loaded all dimension tables and inserted 128,975 rows 
 <h2>Fact Table Loaded Data</h2>
 
 <p>
-Below is a preview of the populated fact_sales table with surrogate keys and metrics.
+Below is a sample preview of the populated fact_sales table with surrogate keys and measures.
 </p>
 
 <img src="fact-table-data.png" alt="Fact Table Data">
@@ -355,30 +357,26 @@ Below is a preview of the populated fact_sales table with surrogate keys and met
 <h2>Validation Checks</h2>
 
 <p>
-Record counts were verified after loading to ensure completeness of warehouse tables.
+Counts were verified after loading to ensure successful warehouse population.
 </p>
 
 <img src="row-counts.png" alt="Row Counts">
 
 </section>
 
-<section id="watermark">
+<section id="incremental">
 <h2>Incremental Loading using Watermark</h2>
 
 <p>
-A watermark table stores the latest successfully loaded date. Future executions only load new rows after that date.
+A watermark table stores the latest loaded business date. During subsequent executions, only records after the saved date are inserted.
 </p>
-
-<pre>
-SELECT * FROM etl_watermark;
-</pre>
 
 <img src="watermark.png" alt="Watermark Table">
 
 <div class="box">
 First Run → Full Load<br>
 Next Runs → Only New Rows<br>
-Improves Speed & Efficiency
+Reduced Processing Time
 </div>
 
 </section>
@@ -387,17 +385,15 @@ Improves Speed & Efficiency
 <h2>Business Insights</h2>
 
 <p>
-Analytical SQL queries were executed on the warehouse to generate business insights.
+SQL queries were executed on the warehouse to identify revenue-driving categories.
 </p>
-
-<h3>Top Revenue Categories</h3>
 
 <img src="analytics-query.png" alt="Business Insights">
 
 <ul>
-<li>Set category generated highest revenue</li>
+<li>Set category generated highest sales revenue</li>
 <li>Kurta ranked second</li>
-<li>Western Dress showed strong sales</li>
+<li>Western Dress performed strongly</li>
 <li>Traditional categories had lower demand</li>
 </ul>
 
@@ -421,11 +417,11 @@ Analytical SQL queries were executed on the warehouse to generate business insig
 <h2>Learning Outcomes</h2>
 
 <ul>
-<li>Real-world ETL workflow understanding</li>
-<li>Star schema design implementation</li>
+<li>Practical ETL pipeline development</li>
+<li>Star schema implementation</li>
 <li>Fact and dimension loading</li>
-<li>Incremental pipeline creation</li>
-<li>Business analytics using SQL</li>
+<li>Incremental processing strategy</li>
+<li>Analytical SQL reporting</li>
 </ul>
 
 </section>
@@ -434,11 +430,11 @@ Analytical SQL queries were executed on the warehouse to generate business insig
 <h2>Conclusion</h2>
 
 <p>
-This project provided practical experience in data engineering concepts such as ETL automation, dimensional modelling, warehouse querying, and incremental data processing.
+This project provided practical understanding of real-world data engineering concepts such as ETL automation, dimensional modelling, warehouse querying, and incremental data loading.
 </p>
 
 <p>
-It demonstrates how raw operational data can be converted into structured analytical systems for decision-making.
+It demonstrates how raw operational data can be converted into reliable analytical systems for business decision-making.
 </p>
 
 </section>
@@ -449,10 +445,10 @@ It demonstrates how raw operational data can be converted into structured analyt
 
 <div class="card">
 <h4>Contents</h4>
-<a href="#intro">Overview</a>
+<a href="#overview">Overview</a>
 <a href="#schema">Schema</a>
 <a href="#etl">ETL</a>
-<a href="#watermark">Incremental</a>
+<a href="#incremental">Incremental</a>
 <a href="#insights">Insights</a>
 <a href="#conclusion">Conclusion</a>
 </div>
